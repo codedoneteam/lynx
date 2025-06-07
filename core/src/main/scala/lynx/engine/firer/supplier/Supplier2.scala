@@ -1,0 +1,11 @@
+package lynx.engine.firer.supplier
+
+import lynx.types.Facts
+
+object Supplier2:
+  given [F[_], A]: Supplier[F, A, (A, A)] =
+    (facts: Facts[A]) =>
+      for
+        facts1 <- facts
+        facts2 <- facts
+      yield (facts1, facts2)
