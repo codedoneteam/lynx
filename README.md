@@ -21,9 +21,9 @@ sealed trait State
 case object Start extends State
 final case class Wait(now: LocalDateTime, till: LocalDateTime) extends State
 case object End extends State
+case object Finish extends State
 
-object Await {
-  def await[F[_] : Temporal : Clock]: PartialFunction1[F, State] = {
+def await[F[_] : Temporal : Clock]: PartialFunction1[F, State] = {
     case Wait(_, till) =>
       for {
         now <- Clock[F].realTime.map(now => toLocalDateTime(now.toMillis))
@@ -34,10 +34,8 @@ object Await {
             .ifM(Temporal[F].sleep(FiniteDuration(100, TimeUnit.MILLISECONDS)).as[State](Wait(now, till)), End.pure[F].widen[State])
       } yield Set(state)
   }
-}
 
-object StartTagged {
-  def start[F[_] : Applicative : Functor : Clock]: PartialFunction1[F, State] = {
+def start[F[_] : Applicative : Functor : Clock]: PartialFunction1[F, State] = {
     case Start =>
       for {
         now <- Clock[F].realTime.map(now => toLocalDateTime(now.toMillis))
@@ -45,11 +43,14 @@ object StartTagged {
         wait = Wait(now, till)
       } yield Set(wait)
   }
+
+def finish: PartialFunction[State, State] = {
+   case End => Finish
 }
 
 implicit val makeFolder: Folder[State, Option[End.type]] = (facts: Facts[State]) => facts.collectFirst { case End => End }
 
-def tags[F[_] : Async : Clock]: Tags[F, State] = start[F] <+> await[F]
+def tags[F[_] : Async : Clock]: Tags[F, State] = start[F] <+> finish <+> await[F]
 
  tags[IO].fire(0)(Start)
 ````
