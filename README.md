@@ -1,6 +1,6 @@
 ## Lynx library
 
-Fine Partial functions on set of facts.
+Apply partial functions on set of facts.
 
 1) Partial functions can be combined in an independent order;
 2) Partial functions applying is parallel and asynchronous;
