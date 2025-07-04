@@ -1,6 +1,11 @@
 ## Lynx library
 
-Business rules engine. Provides firing stateful rules. Rules can be combined in an independent order.
+Fine Partial functions on set of facts.
+
+1) Partial functions can be combined in an independent order;
+2) Partial functions applying is parallel and asynchronous;
+3) Partial function may be effectful;
+4) Partial function may be recursive.
 
 Example
 ````
